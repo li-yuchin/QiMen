@@ -1,3 +1,4 @@
+import { GoogleGenAI } from "@google/genai";
 import { UserInput } from "../types";
 
 const SYSTEM_INSTRUCTION = `
@@ -33,62 +34,63 @@ const SYSTEM_INSTRUCTION = `
 
 export const analyzeQiMen = async (input: UserInput): Promise<string> => {
   try {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) throw new Error("API Key 未設定");
-
-    let promptText = `請根據以下資訊進行預測。
-**事項**：${input.question}\n`;
-
-    // Handle inputs
-    if (input.chartText) promptText += `\n**【排盤文字結果】**：\n${input.chartText}\n`;
-    if (input.birthChartText) promptText += `\n**【命主命盤文字】**：\n${input.birthChartText}\n`;
-    if (input.birthPillars) promptText += `\n**【命主八字】**：${input.birthPillars}\n`;
+    // 使用系統預設且受支援的 API Key
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
-    // Note about images since DeepSeek-R1 is text-based currently
-    if (input.chartImage || input.birthChartImage) {
-      promptText += `\n*(注意：用戶已上傳圖片，但目前軍師優先分析文字資訊，請根據文字描述進行推演)*\n`;
-    }
+    const parts: any[] = [];
+    
+    // 基礎事項資訊
+    parts.push({ text: `請根據以下資訊進行預測與戰略推演：\n\n**事項**：${input.question}\n` });
+
+    // 文字資料
+    if (input.chartText) parts.push({ text: `\n**【提問時間/事件時間排盤文字】**：\n${input.chartText}\n` });
+    if (input.birthChartText) parts.push({ text: `\n**【命主命盤文字】**：\n${input.birthChartText}\n` });
+    if (input.birthPillars) parts.push({ text: `\n**【命主八字】**：${input.birthPillars}\n` });
 
     const timeInfo = input.isNow ? `即刻 (${new Date().toLocaleString()})` : input.consultationTime;
-    promptText += `\n**參考時間**：${timeInfo}\n`;
+    parts.push({ text: `\n**參考時間**：${timeInfo}\n` });
 
-    const response = await fetch("https://api.deepseek.com/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-reasoner", // Use DeepSeek-R1 for deep reasoning
-        messages: [
-          { role: "system", content: SYSTEM_INSTRUCTION },
-          { role: "user", content: promptText }
-        ],
+    // 視覺影像資料處理 (Gemini 3 Pro 原生支援)
+    if (input.chartImage) {
+      const match = input.chartImage.match(/^data:(.*);base64,(.*)$/);
+      if (match) {
+        parts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2],
+          },
+        });
+        parts.push({ text: "(以上圖片為提問/事件之排盤截圖，請優先識別並分析其中的盤面佈局)" });
+      }
+    }
+
+    if (input.birthChartImage) {
+      const match = input.birthChartImage.match(/^data:(.*);base64,(.*)$/);
+      if (match) {
+        parts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2],
+          },
+        });
+        parts.push({ text: "(以上圖片為命主終身局之截圖，請優先識別其中的命宮與年命資訊)" });
+      }
+    }
+
+    // 調用 Gemini 3 Pro，啟用 Thinking 功能以達到類似 DeepSeek R1 的推理效果
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: { parts },
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.3,
-        stream: false
-      })
+        thinkingConfig: { thinkingBudget: 32768 } // 啟用深度推理預算
+      },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || "呼叫 DeepSeek 失敗");
-    }
-
-    const data = await response.json();
-    
-    // DeepSeek-R1 returns content in choices[0].message.content
-    // If we want reasoning_content, it's under message.reasoning_content
-    const content = data.choices[0].message.content;
-    const reasoning = data.choices[0].message.reasoning_content;
-
-    // Optional: Prepend reasoning to the result for a "strategist's inner thought" feel
-    if (reasoning) {
-      return `> **軍師推演筆記**：\n> ${reasoning.split('\n').join('\n> ')}\n\n${content}`;
-    }
-
-    return content || "軍師正在觀星，暫無回應。";
+    return response.text || "軍師正在觀星，暫無回應。";
   } catch (error) {
-    console.error("DeepSeek Error:", error);
-    throw new Error("天機遮蔽（API 連線失敗），請確認 API Key 是否有效或稍後再試。");
+    console.error("Gemini Analysis Error:", error);
+    throw new Error("推演失敗：天機暫時無法窺視（請確認網路連線或 API Key 是否有效）。");
   }
 };
