@@ -13,15 +13,10 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
   const [showTools, setShowTools] = useState(true);
   
   // Divination Chart States
-  const [isNow, setIsNow] = useState(true);
-  const [consultationTime, setConsultationTime] = useState(new Date().toISOString().slice(0, 16));
-  const [divinationPillars, setDivinationPillars] = useState('');
   const [chartText, setChartText] = useState('');
   const [chartImage, setChartImage] = useState('');
   
   // Birth Chart States
-  const [birthDate, setBirthDate] = useState('');
-  const [birthTime, setBirthTime] = useState('');
   const [birthPillars, setBirthPillars] = useState('');
   const [birthChartText, setBirthChartText] = useState('');
   const [birthChartImage, setBirthChartImage] = useState('');
@@ -33,13 +28,8 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
   useEffect(() => {
     if (initialData) {
       setQuestion(initialData.question || '');
-      setIsNow(initialData.isNow ?? true);
-      setConsultationTime(initialData.consultationTime || new Date().toISOString().slice(0, 16));
-      setDivinationPillars(initialData.divinationPillars || '');
       setChartText(initialData.chartText || '');
       setChartImage(initialData.chartImage || '');
-      setBirthDate(initialData.birthDate || '');
-      setBirthTime(initialData.birthTime || '');
       setBirthPillars(initialData.birthPillars || '');
       setBirthChartText(initialData.birthChartText || '');
       setBirthChartImage(initialData.birthChartImage || '');
@@ -61,9 +51,17 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
   };
 
   const getFormData = (): UserInput => ({
-    question, isNow, consultationTime, divinationPillars,
-    birthDate, birthTime, birthPillars, chartText, chartImage,
-    birthChartText, birthChartImage
+    question,
+    isNow: true,
+    consultationTime: new Date().toISOString(),
+    divinationPillars: '',
+    birthDate: '',
+    birthTime: '',
+    birthPillars,
+    chartText,
+    chartImage,
+    birthChartText,
+    birthChartImage
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -182,23 +180,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
                     </div>
                 )}
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-70">
-                <input
-                    type="text"
-                    value={divinationPillars}
-                    onChange={(e) => setDivinationPillars(e.target.value)}
-                    placeholder="若無文字盤，請填四柱 (例: 乙巳年...)"
-                    className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200 focus:border-mystic-gold"
-                />
-                <input
-                    type="datetime-local"
-                    value={consultationTime}
-                    disabled={isNow}
-                    onChange={(e) => setConsultationTime(e.target.value)}
-                    className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200 focus:border-mystic-gold"
-                />
-            </div>
+            <p className="text-[10px] text-gray-500 italic text-right">* 推演將以「即刻」作為時間基底</p>
         </div>
       </div>
 
@@ -239,19 +221,13 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
               )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-                  type="date"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
-              />
+          <div className="w-full">
               <input
                   type="text"
                   value={birthPillars}
                   onChange={(e) => setBirthPillars(e.target.value)}
-                  placeholder="命主八字 (例: 庚午 戊寅...)"
-                  className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
+                  placeholder="命主八字 (例: 庚午年 戊寅月 丁巳日 辛亥時)"
+                  className="w-full bg-mystic-900/50 border border-mystic-700 rounded-lg p-3 text-sm text-gray-200 focus:border-mystic-gold outline-none"
               />
           </div>
         </div>
