@@ -27,6 +27,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
   const [birthChartImage, setBirthChartImage] = useState('');
 
   const chartFileInputRef = useRef<HTMLInputElement>(null);
+  const birthChartFileInputRef = useRef<HTMLInputElement>(null);
 
   // Load initial data if provided (Recall feature)
   useEffect(() => {
@@ -72,7 +73,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
   };
 
   const handleSaveDraft = () => {
-    if (!question.trim() && !chartText.trim() && !chartImage) {
+    if (!question.trim() && !chartText.trim() && !chartImage && !birthChartText.trim() && !birthChartImage) {
       alert("請輸入至少一項資訊再儲存。");
       return;
     }
@@ -103,7 +104,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
               <div>
                 <h4 className="text-mystic-gold text-sm font-bold mb-1">💡 提高準確率建議</h4>
                 <p className="text-xs text-gray-400">
-                  AI 運算可能會有 1-2 節氣誤差。推薦下載手機 <b>「奇門」排盤 App</b> 或至專業網站排盤後，複製<b>「文字結果」</b>貼入下方：
+                  AI 運算可能會有 1-2 節氣誤差。推薦下載手機 <b>「奇門」排盤 App</b> 或至專業網站排盤後，複製<b>「文字結果」</b>或上傳<b>「排盤截圖」</b>貼入下方：
                 </p>
               </div>
               
@@ -207,28 +208,52 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
           命主資訊 (Life Chart)
         </h3>
         
-        <textarea
-            rows={3}
-            value={birthChartText}
-            onChange={(e) => setBirthChartText(e.target.value)}
-            placeholder="在此貼上命主命盤文字 (選填)"
-            className="w-full bg-mystic-900/40 border border-mystic-700 rounded-lg p-3 text-sm text-gray-300 placeholder-gray-600 focus:border-mystic-gold focus:outline-none font-mono"
-        />
+        <div className="space-y-4">
+          <textarea
+              rows={3}
+              value={birthChartText}
+              onChange={(e) => setBirthChartText(e.target.value)}
+              placeholder="在此貼上命主命盤文字 (選填)"
+              className="w-full bg-mystic-900/40 border border-mystic-700 rounded-lg p-3 text-sm text-gray-300 placeholder-gray-600 focus:border-mystic-gold focus:outline-none font-mono"
+          />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
-            />
-            <input
-                type="text"
-                value={birthPillars}
-                onChange={(e) => setBirthPillars(e.target.value)}
-                placeholder="命主八字 (例: 庚午 戊寅...)"
-                className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
-            />
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex-1 w-full">
+                  <input 
+                      type="file" ref={birthChartFileInputRef} accept="image/*" 
+                      onChange={(e) => handleImageUpload(e, setBirthChartImage)} className="hidden" 
+                  />
+                  <button
+                      type="button"
+                      onClick={() => birthChartFileInputRef.current?.click()}
+                      className="w-full flex justify-center items-center gap-2 px-4 py-2 bg-mystic-700 hover:bg-mystic-600 text-gray-200 rounded border border-gray-600 transition-colors text-sm"
+                  >
+                      📸 上傳終身局截圖 (命宮)
+                  </button>
+              </div>
+              {birthChartImage && (
+                  <div className="relative group">
+                      <img src={birthChartImage} alt="Birth Chart" className="h-10 w-10 rounded border border-mystic-gold object-cover" />
+                      <button type="button" onClick={() => clearImage(setBirthChartImage, birthChartFileInputRef)} className="absolute -top-2 -right-2 bg-red-600 rounded-full p-0.5 text-[10px]">✕</button>
+                  </div>
+              )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
+              />
+              <input
+                  type="text"
+                  value={birthPillars}
+                  onChange={(e) => setBirthPillars(e.target.value)}
+                  placeholder="命主八字 (例: 庚午 戊寅...)"
+                  className="bg-mystic-900/50 border border-mystic-700 rounded-lg p-2 text-sm text-gray-200"
+              />
+          </div>
         </div>
       </div>
 

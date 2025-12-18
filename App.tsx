@@ -79,6 +79,11 @@ const App: React.FC = () => {
     setHistory(updated);
   };
 
+  const handleClearAllHistory = () => {
+    historyService.clearAll();
+    setHistory([]);
+  };
+
   return (
     <div className="min-h-screen bg-mystic-900 text-gray-200 font-sans selection:bg-mystic-gold selection:text-mystic-900 pb-20 print:bg-white print:text-black print:pb-0">
       
@@ -171,6 +176,7 @@ const App: React.FC = () => {
         records={history}
         onSelect={handleSelectHistory}
         onDelete={handleDeleteHistory}
+        onClearAll={handleClearAllHistory}
       />
     </div>
   );

@@ -7,9 +7,16 @@ interface HistoryDrawerProps {
   records: HistoryRecord[];
   onSelect: (record: HistoryRecord) => void;
   onDelete: (id: string) => void;
+  onClearAll: () => void;
 }
 
-const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose, records, onSelect, onDelete }) => {
+const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose, records, onSelect, onDelete, onClearAll }) => {
+  const handleClearAll = () => {
+    if (window.confirm('確定要清空所有歷史錦囊嗎？此操作將無法還原。')) {
+      onClearAll();
+    }
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -26,11 +33,25 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose, records,
             <h2 className="text-2xl font-display text-mystic-gold tracking-widest flex items-center gap-3">
               <span className="text-xl">📜</span> 歷次錦囊
             </h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-4">
+              {records.length > 0 && (
+                <button 
+                  onClick={handleClearAll}
+                  className="text-xs text-red-400/70 hover:text-red-400 transition-colors flex items-center gap-1"
+                  title="清空所有記錄"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  清空
+                </button>
+              )}
+              <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* List */}
@@ -51,7 +72,7 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose, records,
                       {new Date(record.timestamp).toLocaleString()}
                     </div>
                     <div className="text-gray-200 font-serif line-clamp-2 pr-8">
-                      {record.input.question}
+                      {record.input.question || (record.result.includes("[僅儲存輸入資訊]") ? "未具名存檔" : "無問題記錄")}
                     </div>
                   </div>
                   

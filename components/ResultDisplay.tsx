@@ -15,26 +15,29 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
   const formatText = (text: string, isForPdf: boolean = false) => {
     // Styles configuration
     const styles = {
-      headerClass: isForPdf 
-        ? "text-amber-900 font-display text-xl mt-6 mb-3 font-bold border-b border-gray-300 pb-2"
+      headerClass: (isFirst: boolean) => isForPdf 
+        ? `${isFirst ? 'mt-0' : 'mt-8'} text-amber-900 font-display text-xl mb-3 font-bold border-b border-gray-300 pb-2`
         : "text-mystic-gold font-display text-xl md:text-2xl mt-6 mb-3 font-bold border-b border-mystic-700 pb-2",
       listClass: isForPdf
         ? "ml-4 pl-2 text-black my-1 list-disc marker:text-amber-700"
         : "ml-4 pl-2 text-gray-300 my-1 list-disc marker:text-mystic-gold",
       pClass: isForPdf
-        ? "text-black leading-relaxed mb-2 font-serif text-justify"
+        ? "text-black leading-relaxed mb-3 font-serif text-justify text-[11pt]"
         : "text-gray-300 leading-relaxed mb-2 font-serif",
       strongHtml: isForPdf
         ? '<strong class="text-amber-700 font-bold">$1</strong>'
         : '<strong class="text-mystic-goldLight font-bold">$1</strong>'
     };
 
+    let headerCount = 0;
     return text.split('\n').map((line, index) => {
       // Headers
       if (line.trim().startsWith('#')) {
         const headerText = line.replace(/^#+\s*/, '');
+        const isFirst = headerCount === 0;
+        headerCount++;
         return (
-          <h3 key={index} className={styles.headerClass}>
+          <h3 key={index} className={styles.headerClass(isFirst)}>
             {headerText}
           </h3>
         );
@@ -109,7 +112,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
   const handleSavePDF = async () => {
     if (!pdfTargetRef.current || isPdfGenerating) return;
     
-    // Check if library loaded
     if (typeof (window as any).html2pdf === 'undefined') {
         alert("PDF 生成組件尚未載入，請稍候再試或重新整理頁面。");
         return;
@@ -119,10 +121,16 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
 
     const element = pdfTargetRef.current;
     const opt = {
-      margin:       10,
+      margin:       0, // Already have 20mm padding in the template
       filename:     `Qimen_Strategy_${new Date().toISOString().slice(0,10)}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true }, // Higher scale for better quality
+      image:        { type: 'jpeg', quality: 1.0 },
+      html2canvas:  { 
+        scale: 3, 
+        useCORS: true, 
+        scrollY: 0, 
+        scrollX: 0,
+        windowWidth: 800 // Consistent width for rendering
+      },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -177,7 +185,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
 
       {/* Main Display (Screen / Dark Mode) */}
       <div className="bg-mystic-800 border-t-4 border-mystic-gold rounded-lg shadow-2xl overflow-hidden relative">
-        {/* Decorative corner elements */}
         <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-white/10 rounded-tl-lg pointer-events-none"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-white/10 rounded-br-lg pointer-events-none"></div>
 
@@ -203,9 +210,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
       </div>
 
       {/* HIDDEN PDF TEMPLATE (Print / Light Mode) */}
-      {/* This element is rendered off-screen specifically for html2pdf to grab */}
-      <div style={{ position: 'absolute', top: 0, left: '-9999px', width: '210mm' }}>
-         <div ref={pdfTargetRef} className="bg-white text-black p-[20mm] font-serif min-h-[297mm]">
+      <div style={{ position: 'absolute', top: '-10000px', left: '-10000px', width: '210mm' }}>
+         <div ref={pdfTargetRef} className="bg-white text-black p-[20mm] font-serif" style={{ width: '210mm' }}>
             <div className="text-center border-b-2 border-amber-600 pb-6 mb-8">
                <h1 className="text-3xl font-bold text-amber-900 font-display tracking-widest">
                  奇門遁甲．時空戰略軍師
@@ -217,8 +223,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
                {formatText(content, true)}
             </div>
 
-            <div className="mt-16 pt-4 border-t border-gray-300 flex justify-between items-center text-xs text-gray-400">
-               <span>AI Powered Qi Men Dun Jia</span>
+            <div className="mt-16 pt-4 border-t border-gray-300 flex justify-between items-center text-[8pt] text-gray-400">
+               <span>AI Powered Qi Men Dun Jia Strategist</span>
                <span>{new Date().toLocaleString()}</span>
             </div>
          </div>
