@@ -147,7 +147,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
       {/* Divination Chart */}
       <div className="space-y-4 pt-6 border-t border-mystic-700/50">
         <h3 className="text-mystic-goldLight font-display text-lg tracking-widest border-l-4 border-mystic-gold pl-3">
-          時空排盤 (Divination Chart)
+          提問時間或事件時間排盤資訊
         </h3>
         
         <div className="space-y-4">
