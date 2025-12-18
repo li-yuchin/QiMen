@@ -30,18 +30,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mystic-900 text-gray-200 font-sans selection:bg-mystic-gold selection:text-mystic-900 pb-20">
+    <div className="min-h-screen bg-mystic-900 text-gray-200 font-sans selection:bg-mystic-gold selection:text-mystic-900 pb-20 print:bg-white print:text-black print:pb-0">
       
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Background Ambience - Hide on Print */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden print:hidden">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-mystic-gold/5 rounded-full blur-[100px]"></div>
         <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-mystic-red/5 rounded-full blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <header className="pt-16 pb-12 text-center">
+        {/* Header - Hide on Print */}
+        <header className="pt-16 pb-12 text-center print:hidden">
           <div className="inline-block mb-4 p-3 rounded-full border border-mystic-gold/30 bg-mystic-800/50 backdrop-blur-sm">
              <span className="text-3xl">☯️</span>
           </div>
@@ -55,17 +55,17 @@ const App: React.FC = () => {
           </p>
         </header>
 
-        {/* Input Form */}
-        <div className="transition-all duration-500 transform">
+        {/* Input Form - Hide on Print */}
+        <div className="transition-all duration-500 transform print:hidden">
           <InputForm 
             onSubmit={handleAnalysisRequest} 
             isLoading={loadingState === LoadingState.LOADING} 
           />
         </div>
 
-        {/* Loading State */}
+        {/* Loading State - Hide on Print */}
         {loadingState === LoadingState.LOADING && (
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center print:hidden">
             <YinYangSpinner />
             <p className="text-mystic-gold animate-pulse font-display tracking-widest mt-6">
               正在排盤推演星象...
@@ -75,7 +75,7 @@ const App: React.FC = () => {
 
         {/* Error State */}
         {loadingState === LoadingState.ERROR && (
-          <div className="mt-8 p-6 bg-red-900/20 border border-red-800/50 rounded-lg max-w-2xl mx-auto text-center">
+          <div className="mt-8 p-6 bg-red-900/20 border border-red-800/50 rounded-lg max-w-2xl mx-auto text-center print:hidden">
              <p className="text-red-400 font-serif">{result}</p>
              <button 
                onClick={() => setLoadingState(LoadingState.IDLE)}
@@ -86,7 +86,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Results */}
+        {/* Results - Visible on Print */}
         <div ref={resultRef}>
           {loadingState === LoadingState.SUCCESS && (
             <ResultDisplay content={result} />
