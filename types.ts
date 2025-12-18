@@ -12,6 +12,13 @@ export interface UserInput {
   birthChartImage: string; // Manual Birth Chart Image (Base64)
 }
 
+export interface HistoryRecord {
+  id: string;
+  timestamp: number;
+  input: UserInput;
+  result: string;
+}
+
 export interface AnalysisResponse {
   rawText: string;
   timestamp: string;

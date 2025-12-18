@@ -1,14 +1,26 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import InputForm from './components/InputForm';
 import ResultDisplay from './components/ResultDisplay';
+import HistoryDrawer from './components/HistoryDrawer';
 import { YinYangSpinner } from './components/YinYangSpinner';
-import { UserInput, LoadingState } from './types';
+import { UserInput, LoadingState, HistoryRecord } from './types';
 import { analyzeQiMen } from './services/geminiService';
+import { historyService } from './services/historyService';
 
 const App: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.IDLE);
   const [result, setResult] = useState<string>('');
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [currentFormData, setCurrentFormData] = useState<UserInput | null>(null);
+  const [formKey, setFormKey] = useState(0);
+  
   const resultRef = useRef<HTMLDivElement>(null);
+
+  // Load history on mount
+  useEffect(() => {
+    setHistory(historyService.getRecords());
+  }, []);
 
   const handleAnalysisRequest = async (data: UserInput) => {
     setLoadingState(LoadingState.LOADING);
@@ -19,6 +31,10 @@ const App: React.FC = () => {
       setResult(analysis);
       setLoadingState(LoadingState.SUCCESS);
       
+      // Save to history
+      const newRecord = historyService.saveRecord(data, analysis);
+      setHistory(prev => [newRecord, ...prev].slice(0, 50));
+
       // Smooth scroll to results after a short delay for rendering
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -27,6 +43,40 @@ const App: React.FC = () => {
       setLoadingState(LoadingState.ERROR);
       setResult(error instanceof Error ? error.message : "發生未知錯誤");
     }
+  };
+
+  const handleSaveInput = (data: UserInput) => {
+    // Save to history with a placeholder result
+    const placeholder = data.question ? `[僅儲存輸入資訊]: ${data.question.slice(0, 20)}...` : "[僅儲存輸入資訊]";
+    const newRecord = historyService.saveRecord(data, placeholder);
+    setHistory(prev => [newRecord, ...prev].slice(0, 50));
+    alert("資訊已儲存至歷史錦囊。");
+  };
+
+  const handleSelectHistory = (record: HistoryRecord) => {
+    // 1. Restore result view
+    setResult(record.result);
+    setLoadingState(LoadingState.SUCCESS);
+    
+    // 2. Restore form input
+    setCurrentFormData(record.input);
+    setFormKey(prev => prev + 1); // Increment key to force InputForm re-mount/reset with initialData
+    
+    setIsHistoryOpen(false);
+    
+    // Smooth scroll to results if there is a real analysis, otherwise scroll to top of form
+    setTimeout(() => {
+      if (record.result.includes("[僅儲存輸入資訊]")) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const handleDeleteHistory = (id: string) => {
+    const updated = historyService.deleteRecord(id);
+    setHistory(updated);
   };
 
   return (
@@ -40,6 +90,22 @@ const App: React.FC = () => {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Navigation / Actions */}
+        <div className="fixed top-6 right-6 z-30 print:hidden">
+           <button 
+             onClick={() => setIsHistoryOpen(true)}
+             className="flex items-center gap-2 px-4 py-2 bg-mystic-800/80 backdrop-blur-md border border-mystic-gold/30 rounded-full text-mystic-gold hover:bg-mystic-700 hover:border-mystic-gold transition-all shadow-xl"
+           >
+             <span className="text-xl">📜</span>
+             <span className="hidden sm:inline font-serif font-bold">歷史錦囊</span>
+             {history.length > 0 && (
+               <span className="bg-mystic-gold text-mystic-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                 {history.length}
+               </span>
+             )}
+           </button>
+        </div>
+
         {/* Header - Hide on Print */}
         <header className="pt-16 pb-12 text-center print:hidden">
           <div className="inline-block mb-4 p-3 rounded-full border border-mystic-gold/30 bg-mystic-800/50 backdrop-blur-sm">
@@ -58,15 +124,18 @@ const App: React.FC = () => {
         {/* Input Form - Hide on Print */}
         <div className="transition-all duration-500 transform print:hidden">
           <InputForm 
+            key={formKey}
             onSubmit={handleAnalysisRequest} 
+            onSave={handleSaveInput}
             isLoading={loadingState === LoadingState.LOADING} 
+            initialData={currentFormData}
           />
         </div>
 
         {/* Loading State - Hide on Print */}
         {loadingState === LoadingState.LOADING && (
           <div className="mt-12 text-center print:hidden">
-            <YinYangSpinner />
+            < YinYangSpinner />
             <p className="text-mystic-gold animate-pulse font-display tracking-widest mt-6">
               正在排盤推演星象...
             </p>
@@ -94,6 +163,15 @@ const App: React.FC = () => {
         </div>
 
       </div>
+
+      {/* History Drawer */}
+      <HistoryDrawer 
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        records={history}
+        onSelect={handleSelectHistory}
+        onDelete={handleDeleteHistory}
+      />
     </div>
   );
 };
