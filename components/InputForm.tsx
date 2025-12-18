@@ -221,7 +221,10 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
               )}
           </div>
 
-          <div className="w-full">
+          <div className="space-y-2">
+              <p className="text-[11px] text-mystic-gold/70 italic ml-1">
+                提示：若未上傳終身局截圖，須填寫命主四柱八字(例：庚午年 戊寅月 丁巳日 辛亥時)
+              </p>
               <input
                   type="text"
                   value={birthPillars}
