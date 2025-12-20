@@ -73,7 +73,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>命理預測．解盤報告</title>
+    <title>奇門遁甲．軍師策論</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Serif TC', serif; background-color: #fdfbf7; color: #1a202c; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.8; }
@@ -84,10 +84,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
     </style>
 </head>
 <body>
-    <h1>解盤報告．命理預測</h1>
+    <h1>軍師策論．時空推演</h1>
     ${contentRef.current.innerHTML}
     <div class="footer">
-        <p>"修身齊家，知命自強。此報告僅供參考，未來掌握在您手中。"</p>
+        <p>"知命不懼，日新其德。策論僅供參考，未來在您掌中。"</p>
         <p>${new Date().toLocaleString()}</p>
     </div>
 </body>
@@ -97,7 +97,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Analysis_Report_${new Date().toISOString().slice(0,10)}.html`;
+    a.download = `Consult_Report_${new Date().toISOString().slice(0,10)}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -111,7 +111,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
     const element = pdfTargetRef.current;
     const opt = {
       margin: 0,
-      filename: `Analysis_Report_${new Date().toISOString().slice(0,10)}.pdf`,
+      filename: `Consult_Report_${new Date().toISOString().slice(0,10)}.pdf`,
       image: { type: 'jpeg', quality: 1.0 },
       html2canvas: { scale: 3, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 800 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -150,7 +150,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
           <div className="flex items-center justify-center mb-8">
             <div className="h-px w-12 bg-mystic-gold/50"></div>
             <h2 className="mx-4 text-2xl font-display text-mystic-gold tracking-widest text-center">
-              解盤報告
+              軍師策論
             </h2>
             <div className="h-px w-12 bg-mystic-gold/50"></div>
           </div>
@@ -159,7 +159,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
           </div>
           <div className="mt-12 pt-6 border-t border-mystic-700 text-center">
             <p className="text-sm text-gray-500 font-serif italic">
-              "修身齊家，知命自強。此報告僅供參考，未來掌握在您手中。"
+              "知命不懼，日新其德。策論僅供參考，未來在您掌中。"
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
          <div ref={pdfTargetRef} className="bg-white text-black p-[20mm] font-serif" style={{ width: '210mm' }}>
             <div className="text-center border-b-2 border-amber-600 pb-6 mb-8">
                <h1 className="text-3xl font-bold text-amber-900 font-display tracking-widest">
-                 命理預測．解盤報告
+                 奇門遁甲．軍師策論
                </h1>
             </div>
             <div className="text-[11pt] leading-relaxed text-justify">

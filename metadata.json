@@ -1,5 +1,21 @@
 {
-  "name": "命理預測解盤師",
-  "description": "融合奇門遁甲、八字、紫微斗數的 AI 命理預測平台，提供專業的運勢解析與決策建議。",
-  "requestFramePermissions": []
+  "name": "奇門遁甲．時空決策軍師",
+  "description": "專業奇門遁甲時空預測平台，運用上古智慧解析局勢，助您趨吉避凶、精準決策。",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "mobilePermissions": [
+    {
+      "android": "android.permission.CAMERA",
+      "reason": "我們需要使用攝影機來拍攝並識別您的奇門遁甲盤面截圖。"
+    },
+    {
+      "ios": "NSCameraUsageDescription",
+      "reason": "我們需要使用攝影機來拍攝並識別您的奇門遁甲盤面截圖。"
+    },
+    {
+      "ios": "NSPhotoLibraryUsageDescription",
+      "reason": "我們需要存取您的相簿以選取已儲存的盤面圖片進行解析。"
+    }
+  ]
 }

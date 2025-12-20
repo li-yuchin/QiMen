@@ -118,12 +118,12 @@ const App: React.FC = () => {
              <span className="text-3xl">☯️</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-mystic-goldLight to-mystic-gold mb-4 drop-shadow-lg">
-            命理預測解盤師
+            奇門遁甲．時空決策軍師
           </h1>
           <p className="text-lg md:text-xl text-gray-400 font-serif max-w-2xl mx-auto leading-relaxed">
-            融合上古時空模型與命理智慧，為您解析局勢。
+            運用上古時空模型，為您解析萬事萬物局勢。
             <br className="hidden md:block"/>
-            運用奇門、八字、紫微之理，助您趨吉避凶。
+            藉由奇門遁甲之理，助您趨吉避凶、運籌帷幄。
           </p>
         </header>
 
@@ -143,7 +143,7 @@ const App: React.FC = () => {
           <div className="mt-12 text-center print:hidden">
             < YinYangSpinner />
             <p className="text-mystic-gold animate-pulse font-display tracking-widest mt-6">
-              正在解盤推演中...
+              軍師正在推演局勢中...
             </p>
           </div>
         )}

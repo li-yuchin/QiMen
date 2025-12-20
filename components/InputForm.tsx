@@ -102,26 +102,26 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
             <div className="flex flex-col gap-3">
               <div>
                 <h4 className="text-mystic-goldLight text-base md:text-lg font-bold mb-2 border-b border-mystic-gold/20 pb-1">
-                  ✨ 可解析奇門遁甲、八字、紫微斗數等命盤
+                  ✨ 推薦使用《奇門》App 獲取精準奇門遁甲盤面
                 </h4>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  推薦使用專業排盤 App 獲取精準盤面。您可以複製<b>「文字排盤」</b>或上傳<b>「排盤截圖」</b>，AI 解盤師將為您深入分析。
+                  您可以透過專業排盤 App 獲取盤面資訊。複製<b>「文字排盤」</b>或上傳<b>「排盤截圖」</b>，軍師將依據九星、八門、八神進行深入分析。
                 </p>
               </div>
               
               <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-mystic-700/50">
-                <span className="text-[10px] text-gray-500 font-serif uppercase tracking-wider">常用工具建議：</span>
+                <span className="text-[10px] text-gray-500 font-serif uppercase tracking-wider">前往排盤：</span>
                 <div className="flex gap-2">
                   <a 
-                    href="https://apps.apple.com/cn/search?term=命理排盤" 
+                    href="https://apps.apple.com/cn/search?term=奇門" 
                     target="_blank" 
                     rel="noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/10 rounded-md text-[10px] text-gray-300 transition-all"
                   >
-                    App Store
+                    App Store (奇門)
                   </a>
                   <a 
-                    href="https://play.google.com/store/search?q=命理排盤&c=apps" 
+                    href="https://play.google.com/store/search?q=奇門遁甲&c=apps" 
                     target="_blank" 
                     rel="noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/10 rounded-md text-[10px] text-gray-300 transition-all"
@@ -156,7 +156,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
               rows={4}
               value={chartText}
               onChange={(e) => setChartText(e.target.value)}
-              placeholder="【在此貼上奇門遁甲、紫微或八字文字排盤】"
+              placeholder="【在此貼上奇門遁甲盤面文字】"
               className="w-full bg-mystic-900/60 border border-mystic-gold/20 rounded-lg p-3 text-sm text-gray-300 placeholder-gray-600 focus:border-mystic-gold focus:outline-none font-mono"
             />
             
@@ -181,7 +181,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
                     </div>
                 )}
             </div>
-            <p className="text-[10px] text-gray-500 italic text-right">* 系統將依據您提供的資訊進行多維度推演</p>
+            <p className="text-[10px] text-gray-500 italic text-right">* 系統將依據奇門遁甲時空模型進行推演</p>
         </div>
       </div>
 
@@ -196,7 +196,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
               rows={3}
               value={birthChartText}
               onChange={(e) => setBirthChartText(e.target.value)}
-              placeholder="在此貼上命主命盤文字 (八字或紫微斗數)"
+              placeholder="在此貼上命主八字或命盤資訊"
               className="w-full bg-mystic-900/40 border border-mystic-700 rounded-lg p-3 text-sm text-gray-300 placeholder-gray-600 focus:border-mystic-gold focus:outline-none font-mono"
           />
 
@@ -211,7 +211,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
                       onClick={() => birthChartFileInputRef.current?.click()}
                       className="w-full flex justify-center items-center gap-2 px-4 py-2 bg-mystic-700 hover:bg-mystic-600 text-gray-200 rounded border border-gray-600 transition-colors text-sm"
                   >
-                      📸 上傳命盤截圖 (年命/命宮)
+                      📸 上傳命盤截圖 (識別年命)
                   </button>
               </div>
               {birthChartImage && (
@@ -224,7 +224,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
 
           <div className="space-y-2">
               <p className="text-[11px] text-mystic-gold/70 italic ml-1">
-                提示：若未上傳截圖，可填寫命主八字(例：庚午年 戊寅月 丁巳日 辛亥時)
+                提示：若提供八字(例：庚午年 戊寅月 丁巳日 辛亥時)，分析將更完整。
               </p>
               <input
                   type="text"
@@ -252,7 +252,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, onSave, isLoading, init
           disabled={isLoading}
           className="flex-[2] py-4 bg-gradient-to-r from-mystic-gold to-amber-600 hover:from-amber-400 hover:to-amber-700 text-mystic-900 font-display font-bold text-xl uppercase tracking-widest rounded-lg shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-50"
         >
-          {isLoading ? "解盤推演中..." : "開始解盤 (Analyze)"}
+          {isLoading ? "軍師推演中..." : "開始推演 (Consult)"}
         </button>
       </div>
     </form>
