@@ -21,11 +21,13 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
         ? "ml-4 pl-2 text-black my-1 list-disc marker:text-amber-700"
         : "ml-4 pl-2 text-gray-300 my-1 list-disc marker:text-mystic-gold",
       pClass: isForPdf
-        ? "text-black leading-relaxed mb-3 font-serif text-justify text-[11pt]"
+        ? "text-black leading-relaxed mb-4 font-serif text-justify text-[11pt]"
         : "text-gray-300 leading-relaxed mb-2 font-serif",
       strongHtml: isForPdf
         ? '<strong class="text-amber-700 font-bold">$1</strong>'
-        : '<strong class="text-mystic-goldLight font-bold">$1</strong>'
+        : '<strong class="text-mystic-goldLight font-bold">$1</strong>',
+      // PDF 專用的分頁規避樣式
+      pdfAvoidBreak: { pageBreakInside: 'avoid' as const, breakInside: 'avoid-page' as const }
     };
 
     let headerCount = 0;
@@ -35,7 +37,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
         const isFirst = headerCount === 0;
         headerCount++;
         return (
-          <h3 key={index} className={styles.headerClass(isFirst)}>
+          <h3 key={index} className={styles.headerClass(isFirst)} style={isForPdf ? styles.pdfAvoidBreak : {}}>
             {headerText}
           </h3>
         );
@@ -43,7 +45,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
       
       if (line.trim().startsWith('*') || line.trim().startsWith('-')) {
         return (
-          <li key={index} className={styles.listClass}>
+          <li key={index} className={styles.listClass} style={isForPdf ? styles.pdfAvoidBreak : {}}>
             <span dangerouslySetInnerHTML={{ 
               __html: line.replace(/^[*-]\s*/, '').replace(/\*\*(.*?)\*\*/g, styles.strongHtml) 
             }} />
@@ -56,7 +58,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
       }
 
       return (
-        <p key={index} className={styles.pClass}>
+        <p key={index} className={styles.pClass} style={isForPdf ? styles.pdfAvoidBreak : {}}>
            <span dangerouslySetInnerHTML={{ 
               __html: line.replace(/\*\*(.*?)\*\*/g, styles.strongHtml) 
             }} />
@@ -110,11 +112,19 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
 
     const element = pdfTargetRef.current;
     const opt = {
-      margin: 0,
+      margin: [15, 15, 15, 15], // 上左下右留白，確保不會貼邊
       filename: `Consult_Report_${new Date().toISOString().slice(0,10)}.pdf`,
-      image: { type: 'jpeg', quality: 1.0 },
-      html2canvas: { scale: 3, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 800 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, // 縮小比例以平衡檔案大小與清晰度
+        useCORS: true, 
+        scrollY: 0, 
+        scrollX: 0, 
+        windowWidth: 800,
+        letterRendering: true // 提升文字渲染品質
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // 強制避開跨頁截斷
     };
 
     try {
@@ -165,8 +175,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
         </div>
       </div>
 
-      <div style={{ position: 'absolute', top: '-10000px', left: '-10000px', width: '210mm' }}>
-         <div ref={pdfTargetRef} className="bg-white text-black p-[20mm] font-serif" style={{ width: '210mm' }}>
+      {/* PDF 隱藏渲染目標 - 優化寬度與內邊距 */}
+      <div style={{ position: 'absolute', top: '-10000px', left: '-10000px', width: '190mm' }}>
+         <div ref={pdfTargetRef} className="bg-white text-black font-serif" style={{ width: '190mm', padding: '10mm' }}>
             <div className="text-center border-b-2 border-amber-600 pb-6 mb-8">
                <h1 className="text-3xl font-bold text-amber-900 font-display tracking-widest">
                  奇門遁甲．軍師策論
@@ -174,6 +185,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ content }) => {
             </div>
             <div className="text-[11pt] leading-relaxed text-justify">
                {formatText(content, true)}
+            </div>
+            <div className="mt-20 pt-10 border-t border-gray-200 text-center text-gray-400 text-xs">
+               <p>"知命不懼，日新其德。策論僅供參考，未來在您掌中。"</p>
+               <p className="mt-2">{new Date().toLocaleString()}</p>
             </div>
          </div>
       </div>
